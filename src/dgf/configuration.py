@@ -7,9 +7,9 @@ def load_v1(path):
     c=json.loads(Path(path).read_text())
     if c.get('format_version')!=1:raise ValueError('Unsupported configuration version')
     data=c['data'];stages=c['stages'];rl=stages['rl'];init=stages['initialization']
-    if data['dataset']!='ETTh1' or data['horizon']not in [192,336]:raise ValueError('Unsupported example data/horizon')
+    if data['dataset']!='ETTh1' or data['horizon']not in [192,336]:raise ValueError('Unsupported data/horizon configuration')
     if (data['mode'],data['context'],data['patch'],data['split_ends'],data['variables'])!=('M',5000,64,[8640,11520,14400],['HUFL','HULL','MUFL','MULL','LUFL','LULL','OT']):raise ValueError('Data contract differs from this implementation')
-    if c['evaluation']['selection']!='validation_MAP_MSE_best' or c['evaluation']['probability_samples']!=1000:raise ValueError('Examples use validation MAP MSE selection and 1000 independent marginal samples')
+    if c['evaluation']['selection']!='validation_MAP_MSE_best' or c['evaluation']['probability_samples']!=1000:raise ValueError('Evaluation requires validation MAP MSE selection and 1000 independent marginal samples')
     if c['validation']['selection']!='MAP_MSE_min' or c['validation']['early_stopping']:raise ValueError('Fixed-budget MAP selection required')
     if rl['fixed_total_concentration'] or min(rl[k]for k in ['dirichlet_objective_weight','dynamic_weight','diversity_weight'])<=0:raise ValueError('All complete-method branches must remain active')
     if init['modes']!=8 or rl['groups']<2 or rl['trajectories_per_group']<2:raise ValueError('Nondegenerate hierarchical groups and modes required')

@@ -37,7 +37,7 @@ The two configurations use the same pinned public data/model versions. If they a
 
 ## Training and Evaluation
 
-The complete pipeline prepares data, trains single-mode supervised weights, initializes modes, runs ordinary preparation, and trains the complete DGF objective. Each configuration declares its stage budgets, validation selectors and parent transfers. Both examples use the same method and select checkpoints by validation MAP MSE. Test evaluation remains a separate command.
+The complete pipeline prepares data, trains single-mode supervised weights, initializes modes, runs ordinary preparation, and trains the complete DGF objective. Each configuration declares its stage budgets, validation selectors and parent transfers. Both configurations use the same method and select checkpoints by validation MAP MSE. Test evaluation remains a separate command.
 
 ### Point forecasting: ETTh1 H336
 
@@ -55,7 +55,7 @@ bash scripts/time_series_forecasting/ETTh1_CRPS.sh train
 bash scripts/time_series_forecasting/ETTh1_CRPS.sh test
 ```
 
-The CRPS example uses the same complete DGF training objective and validation MAP MSE checkpoint selection. Its name identifies the evaluation use case; it does not replace the reward or select by validation CRPS. These two evaluations save point metrics, predictions and independent-marginal fair CRPS using 1000 samples. Users obtain metrics from their own runs.
+The CRPS configuration uses the same complete DGF training objective and validation MAP MSE checkpoint selection. Its name identifies the evaluation use case; it does not replace the reward or select by validation CRPS. Both evaluation commands save point metrics, predictions and independent-marginal fair CRPS using 1000 samples. Users obtain metrics from their own runs.
 
 Configurations: [H336 MSE](config/etth1_h336_mse.json) and [H192 CRPS](config/etth1_h192_crps.json). See [docs/configuration.md](docs/configuration.md) for explicit settings, phase commands and recovery, and [docs/evaluation.md](docs/evaluation.md) for metric definitions and output files.
 

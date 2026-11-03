@@ -1,6 +1,6 @@
 # Data and pretrained model
 
-The examples pin the ETDataset revision and Moirai pretrained revision in each JSON. `scripts/download_assets.py` downloads their public files to caller-selected directories. The model directory must contain config.json and the complete pretrained safetensors files. Model weights, datasets and credentials are not distributed with this source package.
+Each configuration pins the ETDataset revision and Moirai pretrained revision. `scripts/download_assets.py` downloads their public files to caller-selected directories. The model directory must contain config.json and the complete pretrained safetensors files. Model weights, datasets and credentials are not distributed with this source package.
 
 ETTh1 is hourly multivariate forecasting with channels, in order: HUFL, HULL, MUFL, MULL, LUFL, LULL, OT. Training rows are [0,8640), validation [8640,11520), test [11520,14400). The remaining source rows are not added to these splits. Context is 5000, patch size 64, and the H192/H336 horizons are 192 and 336.
 

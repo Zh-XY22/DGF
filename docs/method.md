@@ -8,7 +8,7 @@ Accuracy reward is negative forecast MSE. Four dynamic penalties compare first d
 
 Combined reward is accuracy minus0.01 times the sum of the four penalties. Trajectory advantages standardize along G within each group; group advantages standardize group-average reward along B for the same history. Population standard deviation and epsilon1e-6 are used; constant rewards give legal zero advantage. Actions, rewards and advantages are detached for score-function updates.
 
-The sample score uses the sum of valid joint augmented future log probabilities plus log Cat(z|pi). The group score is log Dir(pi|alpha), with its own group credit. Native family labels are distinguished from outer modes. No clipped importance-ratio surrogate is added by these examples.
+The sample score uses the sum of valid joint augmented future log probabilities plus log Cat(z|pi). The group score is log Dir(pi|alpha), with its own group credit. Native family labels are distinguished from outer modes. The objective uses unclipped score-function updates.
 
 Mode diversity uses squared distances between legal mode-mean level/difference/normalized-spectrum features, normalized by training-only feature scales, capped at1 and averaged across distinct mode pairs. It is an independent differentiable term, not a shared reward offset that cancels during centering.
 

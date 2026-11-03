@@ -32,7 +32,7 @@ Replace MSE with CRPS for the second configuration. The one-command train execut
 python scripts/run.py export-config --config config/etth1_h336_mse.json --output-dir ../declared-settings
 ```
 
-A real run also saves resolved_config.json, prepared protocol, phase JSONs, checkpoint selection records, training/validation curves and training_receipt.json. All numerical defaults used by these examples are explicit or are checked implementation constants.
+A run also saves resolved_config.json, prepared protocol, phase JSONs, checkpoint selection records, training/validation curves and training_receipt.json. All numerical defaults are explicit in the configurations or are checked implementation constants.
 
 ## Recovery
 

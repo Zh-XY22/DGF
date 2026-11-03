@@ -13,7 +13,7 @@ def materialize(training_result, data_dir, model_dir, work_dir, label, checkpoin
         if protocol[field] != c['protocol'][field]:
             raise ValueError('Data protocol differs from training: ' + field)
     if c['dataset'] != 'ETTh1' or c['protocol']['horizon'] not in [192, 336]:
-        raise ValueError('This example covers only the registered ETTh1 H192/336 scope')
+        raise ValueError('Evaluation supports the configured ETTh1 H192/336 scope')
     selected = result['readouts'][label]
     state = Path(checkpoint or selected['checkpoint']).expanduser().resolve()
     if not state.is_file():

@@ -1,6 +1,6 @@
 # Evaluation
 
-The H192/H336 examples use the checkpoint selected by validation MAP MSE. The probability example does not train with a CRPS reward or select the lowest validation CRPS checkpoint. Training and testing are separate commands; the runner freezes the actual validation choice before opening tests.
+Both configurations use the checkpoint selected by validation MAP MSE. The CRPS configuration uses the complete DGF training objective; CRPS is an evaluation metric, not a training reward or checkpoint selector. Training and testing are separate commands; the runner freezes the actual validation choice before opening tests.
 
 MAP uses expected Dirichlet weights alpha/sum(alpha), takes their maximum with first-index tie breaking, and returns that outer mode's legal distribution mean. One trajectory is used for both MSE and MAE. It is not the Dirichlet density mode, mixture mean, sample mean/median or a truth-selected mode. Native Student-t/Normal/NegativeBinomial/LogNormal families are distinct from the outer modes.
 
