@@ -1,0 +1,190 @@
+{
+  "format_version": 1,
+  "name": "etth1_h192_crps",
+  "purpose": "Probabilistic forecasting and fair CRPS evaluation",
+  "model": {
+    "id": "Salesforce/moirai-1.0-R-small",
+    "revision": "f5bd5d01f0d67de856107d43abdd637380aae0a3",
+    "local_files_only": true
+  },
+  "data": {
+    "dataset": "ETTh1",
+    "source_url": "https://raw.githubusercontent.com/zhouhaoyi/ETDataset/1d16c8f4f943005d613b5bc962e9eeb06058cf07/ETT-small/ETTh1.csv",
+    "revision": "1d16c8f4f943005d613b5bc962e9eeb06058cf07",
+    "variables": [
+      "HUFL",
+      "HULL",
+      "MUFL",
+      "MULL",
+      "LUFL",
+      "LULL",
+      "OT"
+    ],
+    "mode": "M",
+    "context": 5000,
+    "patch": 64,
+    "horizon": 192,
+    "split_ends": [
+      8640,
+      11520,
+      14400
+    ],
+    "stride": {
+      "train": 1,
+      "validation": 1,
+      "test": 1
+    },
+    "scaler": {
+      "fit": "train_only",
+      "ddof": 1,
+      "arrow_denominator_epsilon": 1e-10,
+      "forecast_denominator_epsilon": 0.0
+    },
+    "internal_scaling": true,
+    "missing_values": "reject",
+    "padding": "right_pad_to_patch_mask_then_crop",
+    "zeros_observed": true
+  },
+  "random_seeds": {
+    "sft": 1117,
+    "initialization": 1117,
+    "preparation": 1117,
+    "rl": 1117
+  },
+  "optimizer": {
+    "name": "AdamW",
+    "betas": [
+      0.9,
+      0.98
+    ],
+    "epsilon": 1e-06,
+    "weight_decay": {
+      "linear_projection_weights": 0.1,
+      "other_parameters": 0.0
+    },
+    "gradient_clip_norm": 1.0,
+    "scheduler": "constant",
+    "accumulation": "microbatch_loss_weighted_by_actual_inputs_in_logical_batch",
+    "reset_each_stage": true
+  },
+  "numerics": {
+    "model_dtype": "float32",
+    "reward_and_metrics_dtype": "float64",
+    "tf32_matmul": true,
+    "tf32_cudnn": true,
+    "amp": false,
+    "world_size": 1
+  },
+  "stages": {
+    "sft": {
+      "epochs": 10,
+      "objective": "official_PackedNLLLoss",
+      "lr": 1e-07,
+      "effective_batch": 64,
+      "microbatch": 8,
+      "checkpoint_interval_batches": 64,
+      "parent": "public_pretrained_weights",
+      "output_for_next_stage": "validation_MAP_MSE_best"
+    },
+    "initialization": {
+      "route": "D-post",
+      "modes": 8,
+      "head_perturbation": 0.0001,
+      "router_hidden_width": 128,
+      "router_mean_weight_std": 0.001,
+      "concentration_initial": 8.0,
+      "weights_floor": 0.0001,
+      "concentration_floor": 0.001,
+      "operation": "copy_SFT_heads_and_seeded_perturbation",
+      "concentration_parameterization": "floored_softmax_weights_times_softplus_total",
+      "trainable": "backbone_heads_and_router",
+      "lora": false
+    },
+    "preparation": {
+      "epochs": 1,
+      "objective": "legal_trajectory_mixture_NLL",
+      "lr": 1e-07,
+      "effective_batch": 512,
+      "microbatch": 1,
+      "checkpoint_interval_batches": 1,
+      "fixed_total_concentration": true,
+      "parent": "initialized_SFT_weights",
+      "output_for_next_stage": "final"
+    },
+    "rl": {
+      "epochs": 4,
+      "lr": 1.5e-06,
+      "effective_batch": 512,
+      "microbatch": 1,
+      "checkpoint_interval_batches": 1,
+      "groups": 8,
+      "trajectories_per_group": 100,
+      "updates_per_fresh_rollout": 1,
+      "rollout_reuse": 1,
+      "fixed_total_concentration": false,
+      "accuracy_reward": "negative_mean_squared_error",
+      "dynamic_terms": [
+        "first_difference_L1",
+        "second_difference_L1",
+        "normalized_rfft_amplitude_L1",
+        "first_forecast_to_last_history_L1"
+      ],
+      "dynamic_coefficients": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dynamic_weight": 0.01,
+      "dirichlet_objective_weight": 1.0,
+      "diversity_weight": 0.001,
+      "diversity_cap": 1.0,
+      "diversity_rho": 1.0,
+      "diversity_scales": "fit_train_only_level_diff1_diff2_fft",
+      "advantage": "within_group_G_and_across_group_means_B",
+      "advantage_std_correction": 0,
+      "advantage_epsilon": 1e-06,
+      "trajectory_log_probability": "augmented_native_family_joint_trajectory_plus_mode_given_pi",
+      "dirichlet_log_probability": "log_Dirichlet_pi_given_alpha",
+      "gradient_estimator": "detached_score_function",
+      "objective_reduction": "mean_NBG_sample_mean_NB_dirichlet_mean_N_diversity",
+      "ppo_clip": null,
+      "reference_kl": 0.0,
+      "nll_anchor": 0.0
+    }
+  },
+  "validation": {
+    "split": "validation",
+    "first_epoch_fractions": 16,
+    "later_epoch_fractions": 4,
+    "include_initial": true,
+    "repeated_update_states": "reuse_evaluation",
+    "selection": "MAP_MSE_min",
+    "tie_break": "first_strict_improvement",
+    "fixed_budget": true,
+    "early_stopping": false,
+    "samples": 100,
+    "rng": "stage_seed+65537+global_input_block_index",
+    "input_block": 64
+  },
+  "evaluation": {
+    "selection": "validation_MAP_MSE_best",
+    "map": "argmax_expected_Dirichlet_weight_then_selected_mode_mean",
+    "mode_tie_break": "first_index",
+    "point_samples": 100,
+    "point_rng": "training_seed+65537+104729+global_input_block_index",
+    "probability_samples": 1000,
+    "probability_seeds": [
+      1107001,
+      1107003
+    ],
+    "probability_input_block": 4,
+    "probability_sampling": "iid_marginal_outer_mode_per_sample",
+    "crps": "fair_empirical",
+    "scales": [
+      "standardized",
+      "original"
+    ],
+    "save_predictions": true
+  }
+}
