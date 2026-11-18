@@ -62,12 +62,14 @@ Configurations: [H336 MSE](config/etth1_h336_mse.json) and [H192 CRPS](config/et
 ## Citation
 
 ```bibtex
-@misc{dgf2026,
+@misc{zhang2026dirichletguidedgroupforecastingalleviating,
   title={Dirichlet-Guided Group Forecasting for Alleviating Over-smoothing in Time Series Forecasting},
+  author={Xingyu Zhang and Jingyao Wang and Xin Yu and Zeen Song and Jianqi Zhang and Changwen Zheng and Wenwen Qiang},
   year={2026},
   eprint={2606.10592},
   archivePrefix={arXiv},
-  url={https://arxiv.org/abs/2606.10592}
+  primaryClass={cs.LG},
+  url={https://arxiv.org/abs/2606.10592},
 }
 ```
 
